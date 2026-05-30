@@ -1,0 +1,17 @@
+@font-face {
+    font-family: 'newsroom-serif';
+    src: url('/assets/fonts/newsroom-serif.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'deco-sans';
+    src: url('/assets/fonts/deco-sans.woff2') format('woff2');
+}
+
+h1, h2, h3, h4 {
+    font-family: 'newsroom-serif', serif;
+    margin: 0 0 0.5em;
+}
+p, a, li {
+    font-family: 'deco-sans', sans-serif;
+    line-height: 1.6;
+}

@@ -1,0 +1,8 @@
+body {
+    margin: 0;
+    background: #faf7f2;
+    color: #222;
+    font-family: 'deco-sans', sans-serif;
+}
+img { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }

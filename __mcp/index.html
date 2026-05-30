@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MCP Console</title>
+    <link rel="stylesheet" href="/__mcp/assets/css/mcp-core.css">
+    <link rel="stylesheet" href="/__mcp/assets/css/mcp-theme.css">
+    <link rel="stylesheet" href="/__mcp/assets/css/mcp-panels.css">
+</head>
+
+<body class="mcp-boot">
+
+<div id="boot-sequence">
+    <pre>
+Initializing MCP...
+Loading subsystems...
+Grid online.
+Welcome, Operator.
+    </pre>
+</div>
+
+<div id="mcp-ui" style="display:none;">
+    <header class="mcp-header">
+        <h1>MCP</h1>
+        <p class="sub">Mainframe Control Panel</p>
+    </header>
+
+    <nav class="mcp-nav">
+        <button data-panel="launcher">Launcher</button>
+        <button data-panel="system">System Mode</button>
+        <button data-panel="deploy">Deploy Engine</button>
+    </nav>
+
+    <main id="mcp-panels">
+        <section id="launcher" class="panel active">
+            <h2>Launcher</h2>
+            <p>Subsystem shortcuts and quick actions.</p>
+        </section>
+
+        <section id="system" class="panel">
+            <h2>System Mode</h2>
+            <p>Diagnostics and internal state.</p>
+        </section>
+
+        <section id="deploy" class="panel">
+            <h2>Deploy Engine</h2>
+            <button id="trigger-deploy">Trigger Cloudflare Deploy</button>
+        </section>
+    </main>
+</div>
+
+<script src="/__mcp/assets/js/mcp-core.js"></script>
+<script src="/__mcp/assets/js/mcp-launcher.js"></script>
+<script src="/__mcp/assets/js/mcp-system.js"></script>
+<script src="/__mcp/assets/js/mcp-deploy.js"></script>
+
+</body>
+</html>
