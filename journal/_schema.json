@@ -1,0 +1,19 @@
+{
+    "schema_version": "1.0",
+    "section": "journal",
+    "entry_fields": {
+          "slug":       { "type": "string",  "required": true,  "pattern": "^[a-z0-9-]+$", "description": "URL-safe identifier e.g. my-first-post" },
+          "title":      { "type": "string",  "required": true,  "max_length": 120 },
+          "author":     { "type": "string",  "required": true,  "default": "thorkc" },
+          "date":       { "type": "date",    "required": true,  "format": "YYYY-MM-DD" },
+          "tags":       { "type": "array",   "required": false, "items": "string" },
+          "summary":    { "type": "string",  "required": true,  "max_length": 280, "description": "One-sentence teaser shown on index" },
+          "body":       { "type": "html",    "required": true,  "description": "Full article body in HTML" },
+          "status":     { "type": "enum",    "required": true,  "values": ["draft", "review", "published"], "default": "draft" },
+          "hero_image": { "type": "string",  "required": false, "description": "Path relative to assets/images/" },
+          "og_image":   { "type": "string",  "required": false, "description": "Open Graph image for social sharing" }
+    },
+    "file_convention": "journal/{slug}/index.html",
+    "index_file": "journal/_index.json",
+    "template_file": "journal/_template.html"
+}
