@@ -1,0 +1,75 @@
+name: MCP Health Check
+
+# Runs the MCP check-health routine on every push to main
+# and on a daily schedule. Writes results to _admin/status.json
+# and commits back to main if anything changed.
+# This workflow does NOT modify any MCP core files.
+
+on:
+  push:
+      branches: [main]
+          paths-ignore:
+                - '_admin/status.json'   # avoid infinite loop from self-commits
+                  schedule:
+                      - cron: '0 6 * * *'       # 06:00 UTC daily
+                        workflow_dispatch:           # manual trigger from MCP UI
+
+                        concurrency:
+                          group: mcp-health
+                            cancel-in-progress: true
+
+                            jobs:
+                              health-check:
+                                  name: MCP System Health Check
+                                      runs-on: ubuntu-latest
+                                          permissions:
+                                                contents: write           # needed to commit status.json back
+
+                                                    steps:
+                                                          - name: Checkout repo
+                                                                  uses: actions/checkout@v4
+
+                                                                        - name: Setup Node.js
+                                                                                uses: actions/setup-node@v4
+                                                                                        with:
+                                                                                                  node-version: '20'
+
+                                                                                                        - name: Run MCP health check routine
+                                                                                                                id: health
+                                                                                                                        run: |
+                                                                                                                                  node __mcp/routines/check-health.js --json > /tmp/mcp-status.json
+                                                                                                                                            EXIT_CODE=$?
+                                                                                                                                                      cat /tmp/mcp-status.json
+                                                                                                                                                                echo "exit_code=${EXIT_CODE}" >> $GITHUB_OUTPUT
+                                                                                                                                                                          STATUS=$(node -e "const s=require('/tmp/mcp-status.json'); console.log(s.global_status)")
+                                                                                                                                                                                    echo "global_status=${STATUS}" >> $GITHUB_OUTPUT
+                                                                                                                                                                                    
+                                                                                                                                                                                          - name: Update _admin/status.json
+                                                                                                                                                                                                  run: cp /tmp/mcp-status.json _admin/status.json
+                                                                                                                                                                                                  
+                                                                                                                                                                                                        - name: Run asset scan (non-blocking)
+                                                                                                                                                                                                                run: node __mcp/routines/scan-assets.js || true
+                                                                                                                                                                                                                
+                                                                                                                                                                                                                      - name: Commit status.json if changed
+                                                                                                                                                                                                                              run: |
+                                                                                                                                                                                                                                        git config user.name  "MCP Health Bot"
+                                                                                                                                                                                                                                                  git config user.email "mcp-bot@thorkc.com"
+                                                                                                                                                                                                                                                            git add _admin/status.json
+                                                                                                                                                                                                                                                                      if git diff --cached --quiet; then
+                                                                                                                                                                                                                                                                                  echo "No status change -- nothing to commit."
+                                                                                                                                                                                                                                                                                            else
+                                                                                                                                                                                                                                                                                                        git commit -m "chore(mcp): update system health status [skip ci]"
+                                                                                                                                                                                                                                                                                                                    git push
+                                                                                                                                                                                                                                                                                                                              fi
+                                                                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                                                                    - name: Annotate build status
+                                                                                                                                                                                                                                                                                                                                            run: |
+                                                                                                                                                                                                                                                                                                                                                      STATUS="${{ steps.health.outputs.global_status }}"
+                                                                                                                                                                                                                                                                                                                                                                if [ "$STATUS" = "HEALTHY" ]; then
+                                                                                                                                                                                                                                                                                                                                                                            echo "::notice title=MCP Health::Global status: HEALTHY"
+                                                                                                                                                                                                                                                                                                                                                                                      elif [ "$STATUS" = "DEGRADED" ]; then
+                                                                                                                                                                                                                                                                                                                                                                                                  echo "::warning title=MCP Health::Global status: DEGRADED -- check _admin/status.json"
+                                                                                                                                                                                                                                                                                                                                                                                                            else
+                                                                                                                                                                                                                                                                                                                                                                                                                        echo "::error title=MCP Health::Global status: CRITICAL -- immediate operator attention required"
+                                                                                                                                                                                                                                                                                                                                                                                                                                    exit 1
+                                                                                                                                                                                                                                                                                                                                                                                                                                              fi
