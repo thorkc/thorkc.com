@@ -1,69 +1,712 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>ThorKC — Better Homes & Arcades</title>
-    <link rel="stylesheet" href="/assets/css/base.css">
-    <link rel="stylesheet" href="/assets/css/layout.css">
-    <link rel="stylesheet" href="/assets/css/typography.css">
-    <link rel="stylesheet" href="/assets/css/theme.css">
-</head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ThorKC — Kansas City's Digital Home</title>
+  <meta name="description" content="ThorKC — The ThorKC Journal, ThorKCade, Sunday Funnies, PFC, Basement, and Studio. Kansas City's digital home." />
+  <link rel="icon" href="/assets/icons/favicon.ico" type="image/x-icon" />
+  <style>
+    /* ── RESET & BASE ──────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream:   #f4efe5;
+      --cream2:  #ede7d8;
+      --ink:     #1c1917;
+      --ink2:    #3d3832;
+      --rule:    #c8bfae;
+      --red:     #8B0000;
+      --red2:    #b30000;
+      --gold:    #8a6a00;
+      --gold2:   #c49a00;
+      --muted:   #6b6358;
+      --serif:   'Georgia', 'Times New Roman', serif;
+      --mono:    'Courier New', monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--serif);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
+    /* ── THORKCADE TRANSITION OVERLAY ─────────────────── */
+    #thorkc-overlay {
+      position: fixed; inset: 0; z-index: 9000;
+      background: #000;
+      opacity: 0; pointer-events: none;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity 0.3s ease;
+    }
+    #thorkc-overlay.dim   { opacity: 0.6; pointer-events: all; }
+    #thorkc-overlay.flash { opacity: 1; background: #fff; }
+    #thorkc-overlay.boot  { opacity: 1; background: #000; pointer-events: all; }
+    .boot-screen {
+      display: none; flex-direction: column; align-items: center; gap: 1.5rem;
+      font-family: var(--mono); color: #FFD700; text-align: center;
+    }
+    #thorkc-overlay.boot .boot-screen { display: flex; }
+    .boot-logo {
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 900; letter-spacing: 0.12em;
+      color: #FFD700; text-shadow: 0 0 20px #FFD700, 0 0 40px #CC0000;
+      animation: flicker 0.15s infinite alternate;
+    }
+    .boot-sub { font-size: 0.85rem; color: #CC0000; letter-spacing: 0.2em; text-transform: uppercase; }
+    .boot-bar-wrap { width: min(400px, 80vw); height: 6px; background: #1a1a1a; border: 1px solid #333; border-radius: 3px; overflow: hidden; }
+    .boot-bar { height: 100%; width: 0; background: linear-gradient(90deg, #CC0000, #FFD700); animation: loadbar 1.1s ease forwards 0.1s; border-radius: 3px; }
+    .boot-text { font-size: 0.75rem; color: #555; letter-spacing: 0.1em; animation: blink 0.6s step-end infinite; }
+    .scanlines {
+      position: absolute; inset: 0; pointer-events: none;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+    }
+    @keyframes flicker { 0%{opacity:1} 100%{opacity:0.85} }
+    @keyframes loadbar { 0%{width:0} 60%{width:70%} 85%{width:90%} 100%{width:100%} }
+    @keyframes blink   { 50%{opacity:0} }
+
+    /* ── CORPORATE MASTHEAD ────────────────────────────── */
+    .masthead {
+      background: var(--ink);
+      border-bottom: 3px solid var(--red);
+      padding: 0 2rem;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .masthead-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: stretch; justify-content: space-between;
+      height: 56px;
+    }
+    .masthead-brand {
+      display: flex; align-items: center; gap: 0.75rem;
+      text-decoration: none; color: inherit;
+    }
+    .masthead-wordmark {
+      font-size: 1.55rem; font-weight: 900; letter-spacing: 0.06em;
+      color: #f5f0e8; text-shadow: 1px 1px 0 var(--red);
+      font-family: var(--serif);
+    }
+    .masthead-divider {
+      width: 1px; background: #333; margin: 12px 0;
+    }
+    .masthead-tagline {
+      font-size: 0.65rem; color: #888; letter-spacing: 0.18em;
+      text-transform: uppercase; line-height: 1.2;
+    }
+    .masthead-nav {
+      display: flex; align-items: center; gap: 0;
+    }
+    .masthead-nav a {
+      color: #aaa; text-decoration: none; font-size: 0.78rem;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      padding: 0 1rem; height: 56px; display: flex; align-items: center;
+      border-left: 1px solid #222;
+      transition: color 0.15s, background 0.15s;
+    }
+    .masthead-nav a:hover { color: #f5f0e8; background: #111; }
+    .masthead-nav a.nav-arcade {
+      color: #FFD700; border-left: 1px solid #333;
+    }
+    .masthead-nav a.nav-arcade:hover { background: #111; color: #FFD700; text-shadow: 0 0 8px #FFD700; }
+    .masthead-nav a.nav-journal { color: #e8d5b7; font-style: italic; }
+    .masthead-nav a.nav-journal:hover { color: #fff; background: #111; }
+    .masthead-date {
+      display: flex; align-items: center; font-size: 0.68rem;
+      color: #555; letter-spacing: 0.08em; padding-left: 1rem;
+      border-left: 1px solid #222;
+    }
+
+    /* ── HERO BLOCK ────────────────────────────────────── */
+    .hero {
+      border-bottom: 2px solid var(--rule);
+      background: var(--cream);
+    }
+    .hero-inner {
+      max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem;
+      display: grid; grid-template-columns: 1fr 420px; gap: 3rem; align-items: center;
+    }
+    .hero-kicker {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.22em;
+      color: var(--red); font-weight: bold; margin-bottom: 1rem;
+      font-family: var(--mono);
+    }
+    .hero-kicker::before, .hero-kicker::after {
+      content: ''; display: block; height: 1px; background: var(--red); width: 28px;
+    }
+    .hero-headline {
+      font-size: clamp(1.9rem, 3.5vw, 2.9rem); line-height: 1.15;
+      font-weight: 900; color: var(--ink); margin-bottom: 1rem;
+      letter-spacing: -0.01em;
+    }
+    .hero-deck {
+      font-size: 1.05rem; color: var(--ink2); line-height: 1.7;
+      margin-bottom: 1.75rem; max-width: 520px;
+    }
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      background: var(--red); color: #f5f0e8;
+      padding: 0.7rem 1.6rem; font-size: 0.82rem; font-family: var(--mono);
+      text-transform: uppercase; letter-spacing: 0.14em; text-decoration: none;
+      border: 2px solid var(--red); font-weight: bold;
+      transition: background 0.15s, color 0.15s;
+    }
+    .hero-cta:hover { background: transparent; color: var(--red); }
+    .hero-cta svg { width: 14px; height: 14px; }
+    .hero-image {
+      position: relative; aspect-ratio: 4/3; overflow: hidden;
+      border: 1px solid var(--rule); box-shadow: 4px 4px 0 var(--rule);
+    }
+    .hero-image-inner {
+      width: 100%; height: 100%;
+      background: var(--cream2);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 2rem; text-align: center;
+      /* Engraved/letterpress texture */
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(0,0,0,0.04) 18px, rgba(0,0,0,0.04) 19px),
+        repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(0,0,0,0.02) 18px, rgba(0,0,0,0.02) 19px);
+    }
+    .hero-image-emblem {
+      width: 80px; height: 80px; margin-bottom: 1rem;
+      border: 3px solid var(--ink); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--ink); color: var(--cream);
+      font-size: 1.9rem; font-weight: 900; font-style: italic;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.15);
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+    }
+    .hero-image-caption {
+      font-family: var(--mono); font-size: 0.75rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.14em; margin-top: 0.75rem;
+    }
+    .hero-image-rule { width: 60px; height: 2px; background: var(--red); margin: 0.75rem auto; }
+    .hero-image-issue {
+      font-size: 0.65rem; color: var(--muted); font-family: var(--mono);
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    /* Letterpress border detail */
+    .hero-image::before {
+      content: ''; position: absolute; inset: 6px;
+      border: 1px solid rgba(0,0,0,0.12); pointer-events: none; z-index: 1;
+    }
+
+    /* ── SECTION DIVIDER ───────────────────────────────── */
+    .section-header {
+      max-width: 1200px; margin: 0 auto; padding: 2rem 2rem 0.75rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .section-header h2 {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.22em;
+      color: var(--muted); font-family: var(--mono); white-space: nowrap;
+    }
+    .section-header-rule {
+      flex: 1; height: 1px; background: var(--rule);
+    }
+
+    /* ── PLATFORM GRID ─────────────────────────────────── */
+    .platform-grid-wrap { border-bottom: 2px solid var(--rule); padding-bottom: 2rem; }
+    .platform-grid {
+      max-width: 1200px; margin: 0 auto; padding: 0 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 1rem;
+    }
+    /* Journal = dominant tile: spans 1 col, 2 rows */
+    .tile { border: 1px solid var(--rule); text-decoration: none; display: block; overflow: hidden; transition: box-shadow 0.15s; position: relative; }
+    .tile:hover { box-shadow: 3px 3px 0 var(--rule); }
+
+    .tile-journal {
+      grid-column: 1; grid-row: 1 / 3;
+      background: var(--ink);
+      /* Engraved texture */
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 22px, rgba(255,255,255,0.025) 22px, rgba(255,255,255,0.025) 23px),
+        repeating-linear-gradient(90deg, transparent, transparent 22px, rgba(255,255,255,0.01) 22px, rgba(255,255,255,0.01) 23px);
+      min-height: 380px;
+      border: none;
+    }
+    .tile-journal:hover { box-shadow: 4px 4px 0 var(--red); }
+    .tile-journal-inner {
+      padding: 2rem; height: 100%; display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .tile-journal-top { flex: 1; }
+    .tile-badge {
+      display: inline-block; background: var(--red); color: #f5f0e8;
+      font-size: 0.62rem; font-family: var(--mono); letter-spacing: 0.16em;
+      text-transform: uppercase; padding: 0.25rem 0.6rem; margin-bottom: 1.25rem;
+    }
+    .tile-journal-emblem {
+      width: 56px; height: 56px; border: 2px solid rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--cream); font-size: 1.4rem; font-weight: 900; font-style: italic;
+      margin-bottom: 1.5rem;
+      background: rgba(255,255,255,0.05);
+    }
+    .tile-journal h3 {
+      font-size: clamp(1.2rem, 2.5vw, 1.7rem); color: #f5f0e8;
+      line-height: 1.2; margin-bottom: 0.75rem; font-weight: 900;
+    }
+    .tile-journal-date {
+      font-size: 0.72rem; color: rgba(255,255,255,0.4); font-family: var(--mono);
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;
+    }
+    .tile-journal-teaser { font-size: 0.9rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
+    .tile-journal-footer {
+      border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; margin-top: 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .tile-journal-masthead {
+      font-size: 0.68rem; color: rgba(255,255,255,0.3); font-style: italic; letter-spacing: 0.06em;
+    }
+    .tile-arrow {
+      font-size: 0.8rem; color: var(--red); letter-spacing: 0.05em; font-family: var(--mono);
+    }
+
+    /* Regular tiles */
+    .tile-sm { background: var(--cream2); padding: 1.25rem 1.5rem; display: flex; flex-direction: column; justify-content: space-between; min-height: 170px; }
+    .tile-sm-icon { font-size: 1.4rem; margin-bottom: 0.5rem; }
+    .tile-sm h3 { font-size: 1rem; color: var(--ink); margin-bottom: 0.25rem; }
+    .tile-sm p { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+    .tile-sm-footer { margin-top: 0.75rem; font-size: 0.7rem; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--red); }
+    .tile-arcade {
+      background: var(--ink); color: var(--cream);
+    }
+    .tile-arcade h3 { color: #FFD700; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+    .tile-arcade p { color: rgba(255,255,255,0.5); }
+    .tile-arcade .tile-sm-footer { color: #FFD700; }
+    .tile-arcade .tile-sm-icon { filter: drop-shadow(0 0 4px #FFD700); }
+
+    /* ── MIXED FEED ────────────────────────────────────── */
+    .feed-wrap { border-bottom: 2px solid var(--rule); }
+    .feed-grid {
+      max-width: 1200px; margin: 0 auto; padding: 0 2rem 2rem;
+      display: grid; grid-template-columns: 2fr 1fr; gap: 2.5rem;
+    }
+    .feed-main { }
+    .feed-sidebar { border-left: 1px solid var(--rule); padding-left: 2rem; }
+    .feed-item {
+      display: grid; grid-template-columns: 1fr;
+      border-bottom: 1px solid var(--rule); padding: 1.5rem 0; gap: 0.4rem;
+    }
+    .feed-item:last-child { border-bottom: none; }
+    .feed-item-source {
+      font-size: 0.65rem; font-family: var(--mono); text-transform: uppercase;
+      letter-spacing: 0.18em; color: var(--red); font-weight: bold;
+    }
+    .feed-item-source.arcade-source { color: #8a6a00; }
+    .feed-item h3 {
+      font-size: 1.15rem; color: var(--ink); line-height: 1.25; font-weight: 700;
+    }
+    .feed-item p { font-size: 0.9rem; color: var(--ink2); line-height: 1.65; }
+    .feed-item-meta {
+      font-size: 0.7rem; color: var(--muted); font-family: var(--mono);
+      letter-spacing: 0.06em; margin-top: 0.25rem;
+    }
+    .feed-item-read {
+      display: inline-block; margin-top: 0.4rem; font-size: 0.72rem;
+      font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--red); text-decoration: none; border-bottom: 1px solid currentColor;
+      padding-bottom: 1px;
+    }
+    .feed-item-read:hover { color: var(--ink); }
+    /* Journal feed items get a left-border accent */
+    .feed-item.is-journal { border-left: 3px solid var(--red); padding-left: 1.25rem; }
+    .feed-item.is-journal h3 { font-size: 1.3rem; }
+
+    /* Sidebar */
+    .sidebar-block { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--rule); }
+    .sidebar-block:last-child { border-bottom: none; }
+    .sidebar-block-title {
+      font-size: 0.65rem; font-family: var(--mono); text-transform: uppercase;
+      letter-spacing: 0.2em; color: var(--muted); margin-bottom: 1rem;
+    }
+    .sidebar-item { padding: 0.6rem 0; border-bottom: 1px solid var(--rule); }
+    .sidebar-item:last-child { border-bottom: none; }
+    .sidebar-item h4 { font-size: 0.88rem; color: var(--ink); line-height: 1.3; }
+    .sidebar-item p { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; line-height: 1.4; }
+
+    /* ── FOOTER ────────────────────────────────────────── */
+    footer {
+      background: var(--ink); color: var(--cream);
+      border-top: 3px solid var(--red);
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem;
+    }
+    .footer-mini-masthead {
+      text-align: center; padding: 1.5rem 0 2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 1.5rem;
+    }
+    .footer-journal-name {
+      font-size: 1.5rem; font-weight: 900; color: #f5f0e8;
+      font-style: italic; letter-spacing: 0.04em; display: block;
+      margin-bottom: 0.4rem; text-shadow: 1px 1px 0 var(--red);
+    }
+    .footer-journal-rule {
+      width: 60px; height: 1px; background: var(--red); margin: 0.6rem auto;
+    }
+    .footer-journal-tagline {
+      font-size: 0.75rem; font-family: var(--mono); letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(255,255,255,0.4);
+    }
+    .footer-nav {
+      display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0;
+      margin-bottom: 1.5rem;
+    }
+    .footer-nav a {
+      color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.72rem;
+      font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.25rem 1rem; border-right: 1px solid rgba(255,255,255,0.15);
+      transition: color 0.15s;
+    }
+    .footer-nav a:first-child { border-left: 1px solid rgba(255,255,255,0.15); }
+    .footer-nav a:hover { color: var(--cream); }
+    .footer-copy {
+      text-align: center; font-size: 0.68rem; color: rgba(255,255,255,0.25);
+      font-family: var(--mono); letter-spacing: 0.08em;
+    }
+
+    /* ── RESPONSIVE ────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 1.5rem; }
+      .hero-image { max-width: 420px; }
+      .platform-grid { grid-template-columns: 1fr 1fr; }
+      .tile-journal { grid-column: 1 / 3; grid-row: 1; min-height: 260px; }
+      .feed-grid { grid-template-columns: 1fr; }
+      .feed-sidebar { border-left: none; padding-left: 0; border-top: 2px solid var(--rule); padding-top: 1.5rem; }
+      .masthead-nav a { padding: 0 0.6rem; font-size: 0.72rem; }
+      .masthead-date { display: none; }
+    }
+    @media (max-width: 600px) {
+      .platform-grid { grid-template-columns: 1fr; }
+      .tile-journal { grid-column: 1; grid-row: 1; }
+      .masthead-nav a.hide-sm { display: none; }
+    }
+  </style>
+</head>
 <body>
 
-<header class="site-header">
-    <div class="masthead">
-        <img src="/assets/img/logo.svg" alt="ThorKC Logo" class="logo">
-        <h1 class="site-title">ThorKC</h1>
-        <p class="tagline">Better Homes & Arcades</p>
+  <!-- ── THORKCADE TRANSITION OVERLAY ── -->
+  <div id="thorkc-overlay" role="presentation" aria-hidden="true">
+    <div class="scanlines"></div>
+    <div class="boot-screen">
+      <div class="boot-logo">THORKCADE</div>
+      <div class="boot-sub">Kansas City Arcade — Insert Coin</div>
+      <div class="boot-bar-wrap"><div class="boot-bar"></div></div>
+      <div class="boot-text">LOADING GAME LIBRARY...</div>
     </div>
+  </div>
 
-    <nav class="nav">
+  <!-- ── CORPORATE MASTHEAD ── -->
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="masthead-brand" href="/">
+        <span class="masthead-wordmark">ThorKC</span>
+        <div class="masthead-divider"></div>
+        <span class="masthead-tagline">Kansas City's<br>Digital Home</span>
+      </a>
+      <nav class="masthead-nav">
+        <a href="/journal/" class="nav-journal">Journal</a>
+        <a href="/sunday-funnies/" class="hide-sm">Funnies</a>
+        <a href="/pfc/" class="hide-sm">PFC</a>
+        <a href="/insider/" class="hide-sm">Insider</a>
+        <a href="/thorkcade/" class="nav-arcade arcade-trigger">ThorKCade ▶</a>
+        <span class="masthead-date">Sat · Jun 6 · 2026</span>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- ── HERO BLOCK — TODAY IN THE THORKC JOURNAL ────── -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-kicker">Today in The ThorKC Journal</div>
+        <h1 class="hero-headline">What Kansas City Gets Right — And Refuses to Apologize For</h1>
+        <p class="hero-deck">From championship culture to corner BBQ spots that have been there since before you were born, this city runs on something most places can't manufacture. Today's edition gets into it.</p>
+        <a class="hero-cta" href="/journal/">
+          Read Today's Edition
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+      </div>
+      <div class="hero-image">
+        <div class="hero-image-inner">
+          <div class="hero-image-emblem">TJ</div>
+          <div style="font-size:1rem;font-weight:900;color:var(--ink);letter-spacing:0.04em;margin-bottom:.25rem;">The ThorKC Journal</div>
+          <div class="hero-image-rule"></div>
+          <div class="hero-image-caption">Est. Kansas City, MO</div>
+          <div class="hero-image-issue">Vol. I · Edition No. 1 · June 2026</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- ── PLATFORM GRID ────────────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="platform-grid-wrap">
+    <div class="section-header">
+      <h2>Platforms</h2>
+      <div class="section-header-rule"></div>
+    </div>
+    <div class="platform-grid">
+
+      <!-- JOURNAL — DOMINANT TILE -->
+      <a class="tile tile-journal" href="/journal/">
+        <div class="tile-journal-inner">
+          <div class="tile-journal-top">
+            <span class="tile-badge">★ Latest Edition</span>
+            <div class="tile-journal-emblem">TJ</div>
+            <div class="tile-journal-date">June 6, 2026</div>
+            <h3>The ThorKC Journal</h3>
+            <p class="tile-journal-teaser">Long-form writing, sharp takes, and Kansas City stories told the way they deserve to be — without the noise.</p>
+          </div>
+          <div class="tile-journal-footer">
+            <span class="tile-journal-masthead">The ThorKC Journal</span>
+            <span class="tile-arrow">Read →</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- THORKCADE -->
+      <a class="tile tile-sm tile-arcade arcade-trigger" href="/thorkcade/">
+        <div>
+          <div class="tile-sm-icon">🕹️</div>
+          <h3>ThorKCade</h3>
+          <p>Browser games, interactive experiences, and arcade energy. No quarters needed.</p>
+        </div>
+        <div class="tile-sm-footer">Enter Arcade →</div>
+      </a>
+
+      <!-- SUNDAY FUNNIES -->
+      <a class="tile tile-sm" href="/sunday-funnies/" style="background:var(--cream2);">
+        <div>
+          <div class="tile-sm-icon">🗞️</div>
+          <h3>Sunday Funnies</h3>
+          <p>Weekly comics and illustrated strips — the good kind, without the think-pieces.</p>
+        </div>
+        <div class="tile-sm-footer" style="color:var(--muted);">View Comics →</div>
+      </a>
+
+      <!-- BASEMENT -->
+      <a class="tile tile-sm" href="/basement/" style="background:#e8e2d5;">
+        <div>
+          <div class="tile-sm-icon">🏚️</div>
+          <h3>The Basement</h3>
+          <p>Rough cuts, unfinished ideas, experiments, and things that didn't quite make it upstairs.</p>
+        </div>
+        <div class="tile-sm-footer" style="color:var(--muted);">Go Downstairs →</div>
+      </a>
+
+      <!-- PFC -->
+      <a class="tile tile-sm" href="/pfc/" style="background:var(--cream2);">
+        <div>
+          <div class="tile-sm-icon">🏆</div>
+          <h3>PFC</h3>
+          <p>The People's Fan Club — community spotlights, nominations, and KC celebrations.</p>
+        </div>
+        <div class="tile-sm-footer" style="color:var(--muted);">Nominate →</div>
+      </a>
+
+      <!-- STUDIO / PROJECTS -->
+      <a class="tile tile-sm" href="/insider/" style="background:#e5e0d8;">
+        <div>
+          <div class="tile-sm-icon">⚙️</div>
+          <h3>Studio / Projects</h3>
+          <p>Behind-the-scenes work, builds, tools, and what's being made inside ThorKC Studios.</p>
+        </div>
+        <div class="tile-sm-footer" style="color:var(--muted);">See the Work →</div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- ── MIXED FEED ───────────────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="feed-wrap">
+    <div class="section-header">
+      <h2>Latest</h2>
+      <div class="section-header-rule"></div>
+    </div>
+    <div class="feed-grid">
+      <div class="feed-main">
+
+        <!-- Journal Story 1 — Latest -->
+        <article class="feed-item is-journal">
+          <span class="feed-item-source">The ThorKC Journal</span>
+          <h3>What Kansas City Gets Right — And Refuses to Apologize For</h3>
+          <p>Championship culture, generational BBQ, and a chip on the shoulder that Kansas City has always worn with pride. Today's lead goes long on what makes this city different.</p>
+          <div class="feed-item-meta">Jun 6, 2026 · Edition No. 1</div>
+          <a class="feed-item-read" href="/journal/">Read full story →</a>
+        </article>
+
+        <!-- Journal Story 2 — Second Latest -->
+        <article class="feed-item is-journal">
+          <span class="feed-item-source">The ThorKC Journal</span>
+          <h3>The Corner Store Problem: Why Small Businesses Keep Closing in Historic Districts</h3>
+          <p>Three neighborhoods, a decade of data, and the landlords nobody's writing about. A Journal investigation into what KC is quietly losing.</p>
+          <div class="feed-item-meta">Jun 5, 2026 · Edition No. 1</div>
+          <a class="feed-item-read" href="/journal/">Read full story →</a>
+        </article>
+
+        <!-- ThorKCade Update -->
+        <article class="feed-item">
+          <span class="feed-item-source arcade-source">ThorKCade</span>
+          <h3>New Game Loading: The Arcade Is Being Built</h3>
+          <p>First titles are being developed. Expect browser-based originals with KC flavor built in. No microtransactions. No ads. Just games.</p>
+          <div class="feed-item-meta">Jun 2026 · ThorKCade</div>
+          <a class="feed-item-read arcade-trigger" href="/thorkcade/">Enter ThorKCade →</a>
+        </article>
+
+        <!-- Studio Announcement -->
+        <article class="feed-item">
+          <span class="feed-item-source" style="color:var(--gold);">Studio / Projects</span>
+          <h3>ThorKC.com Is Live — Here's What's Built and What's Coming</h3>
+          <p>The infrastructure is up. The Journal is publishing. The Arcade is loading. Here's the complete rundown of what launched and what's on deck for the rest of 2026.</p>
+          <div class="feed-item-meta">Jun 6, 2026 · ThorKC Studios</div>
+          <a class="feed-item-read" href="/insider/">Read the update →</a>
+        </article>
+
+        <!-- Sunday Funnies -->
+        <article class="feed-item">
+          <span class="feed-item-source" style="color:var(--muted);">Sunday Funnies</span>
+          <h3>First Strip Coming Sunday</h3>
+          <p>The artists are warming up. The first illustrated strip drops this Sunday — and yes, it's about Kansas City.</p>
+          <div class="feed-item-meta">Coming Sun · Jun 7, 2026</div>
+          <a class="feed-item-read" href="/sunday-funnies/">Preview section →</a>
+        </article>
+
+        <!-- PFC -->
+        <article class="feed-item">
+          <span class="feed-item-source" style="color:var(--muted);">PFC</span>
+          <h3>Nominations Open — Who Deserves a Spotlight This Month?</h3>
+          <p>The People's Fan Club is open for its first round of nominations. KC local businesses, creators, teams, and institutions welcome.</p>
+          <div class="feed-item-meta">Jun 2026 · PFC</div>
+          <a class="feed-item-read" href="/pfc/">Nominate →</a>
+        </article>
+
+        <!-- Basement -->
+        <article class="feed-item">
+          <span class="feed-item-source" style="color:var(--muted);">The Basement</span>
+          <h3>Rough Cuts and Unfinished Things</h3>
+          <p>Everything that didn't make the cut — at least not yet. The Basement holds the experiments, half-finished ideas, and things we're not sure about yet.</p>
+          <div class="feed-item-meta">Ongoing · ThorKC</div>
+          <a class="feed-item-read" href="/basement/">Go downstairs →</a>
+        </article>
+
+      </div>
+
+      <!-- SIDEBAR -->
+      <aside class="feed-sidebar">
+
+        <div class="sidebar-block">
+          <div class="sidebar-block-title">From the Journal</div>
+          <div class="sidebar-item">
+            <h4>On KC Championship Culture</h4>
+            <p>What back-to-back titles actually do to a city's identity.</p>
+          </div>
+          <div class="sidebar-item">
+            <h4>The Case for Staying</h4>
+            <p>Why KC keeps pulling people back, even when they leave.</p>
+          </div>
+          <div class="sidebar-item">
+            <h4>BBQ Is Not a Metaphor</h4>
+            <p>Stop making it one. A defense of taking food seriously.</p>
+          </div>
+        </div>
+
+        <div class="sidebar-block">
+          <div class="sidebar-block-title">ThorKCade Preview</div>
+          <div class="sidebar-item">
+            <h4>🕹️ Game 01 — In Development</h4>
+            <p>First title in build. KC-themed. No spoilers yet.</p>
+          </div>
+          <div class="sidebar-item">
+            <h4>🕹️ Game 02 — Concept Stage</h4>
+            <p>Something fast. Something local. Something fun.</p>
+          </div>
+        </div>
+
+        <div class="sidebar-block">
+          <div class="sidebar-block-title">This Week in PFC</div>
+          <div class="sidebar-item">
+            <h4>First Nominations Open</h4>
+            <p>Submit a KC local worth celebrating before June 15th.</p>
+          </div>
+        </div>
+
+        <div class="sidebar-block" style="border:1px solid var(--rule);padding:1.25rem;background:var(--cream2);">
+          <div class="sidebar-block-title">The ThorKC Journal</div>
+          <p style="font-size:.82rem;color:var(--ink2);line-height:1.6;margin-bottom:.75rem;">Published by ThorKC Studios. Long-form writing on Kansas City — stories, investigations, and takes that earn the read.</p>
+          <a href="/journal/" style="font-size:.72rem;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--red);text-decoration:none;border-bottom:1px solid currentColor;">Read the Journal →</a>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- ── FOOTER ───────────────────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <footer>
+    <div class="footer-inner">
+      <!-- Mini-masthead -->
+      <div class="footer-mini-masthead">
+        <span class="footer-journal-name">The ThorKC Journal</span>
+        <div class="footer-journal-rule"></div>
+        <div class="footer-journal-tagline">Published by ThorKC Studios &mdash; Clarity. Honesty. Synergy.</div>
+      </div>
+      <nav class="footer-nav">
         <a href="/journal/">Journal</a>
+        <a href="/sunday-funnies/">Sunday Funnies</a>
         <a href="/thorkcade/">ThorKCade</a>
-        <a href="/funnies/">Sunday Funnies</a>
-    </nav>
-</header>
-
-<section class="hero">
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-        <h2 class="hero-headline">A Modern Chronicle with a Mid‑Century Soul</h2>
-        <p class="hero-subhead">
-            Stories, arcades, and illustrated mischief — all under one newsroom roof.
-        </p>
+        <a href="/pfc/">PFC</a>
+        <a href="/basement/">Basement</a>
+        <a href="/insider/">Insider</a>
+      </nav>
+      <div class="footer-copy">&copy; 2026 ThorKC &mdash; Kansas City, MO &mdash; All rights reserved</div>
     </div>
-</section>
+  </footer>
 
-<section class="featured">
-    <h3 class="section-title">From the Journal</h3>
-    <div class="card-grid">
-        <article class="card">
-            <img src="/assets/img/placeholder.jpg">
-            <h4>Placeholder Headline</h4>
-            <p>A preview of what’s coming to the ThorKC Journal.</p>
-        </article>
-        <article class="card">
-            <img src="/assets/img/placeholder.jpg">
-            <h4>Another Story</h4>
-            <p>Editorial layout, mid‑century typography, clean lines.</p>
-        </article>
-    </div>
-</section>
+  <!-- ── THORKCADE TRANSITION SCRIPT ── -->
+  <script>
+    const overlay = document.getElementById('thorkc-overlay');
 
-<section class="spotlight">
-    <h3 class="section-title">ThorKCade Spotlight</h3>
-    <p>Your home arcade collection, curated and celebrated.</p>
-</section>
+    function launchArcade(e) {
+      e.preventDefault();
+      const target = e.currentTarget.getAttribute('href') || '/thorkcade/';
 
-<section class="funnies">
-    <h3 class="section-title">Sunday Funnies</h3>
-    <p>Illustrated humor with a retro twist.</p>
-</section>
+      // Phase 1: DIM (0–300ms)
+      overlay.className = 'dim';
 
-<footer class="site-footer">
-    <p>© 2026 ThorKC — Published from Kansas City</p>
-</footer>
+      // Phase 2: FLASH (300–500ms)
+      setTimeout(() => {
+        overlay.className = 'flash';
+      }, 300);
+
+      // Phase 3: BOOT SCREEN (500ms–1600ms)
+      setTimeout(() => {
+        overlay.className = 'boot';
+      }, 500);
+
+      // Phase 4: NAVIGATE (1700ms)
+      setTimeout(() => {
+        window.location.href = target;
+      }, 1700);
+    }
+
+    document.querySelectorAll('.arcade-trigger').forEach(el => {
+      el.addEventListener('click', launchArcade);
+    });
+  </script>
 
 </body>
 </html>
