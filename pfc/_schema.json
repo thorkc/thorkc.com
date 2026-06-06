@@ -1,0 +1,14 @@
+{
+    "schema_version": "1.0",
+    "section": "pfc",
+    "entry_fields": {
+          "slug":     { "type": "string", "required": true, "pattern": "^[a-z0-9-]+$" },
+          "name":     { "type": "string", "required": true },
+          "category": { "type": "enum",   "required": true, "values": ["restaurant","venue","person","team","event","business"] },
+          "summary":  { "type": "string", "required": true, "max_length": 280 },
+          "date":     { "type": "date",   "required": true },
+          "status":   { "type": "enum",   "required": true, "values": ["draft","published"], "default": "draft" }
+    },
+    "file_convention": "pfc/{slug}/index.html",
+    "index_file": "pfc/_index.json"
+}
