@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /_admin/
+Disallow: /__mcp/
+
+Sitemap: https://thorkc.com/sitemap.xml
