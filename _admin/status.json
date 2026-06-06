@@ -1,0 +1,18 @@
+{
+    "site": "thorkc.com",
+    "version": "1.0.0",
+    "last_deploy": null,
+    "sections": {
+          "home": { "status": "live", "path": "/" },
+          "journal": { "status": "scaffolded", "path": "/journal/" },
+          "sunday-funnies": { "status": "scaffolded", "path": "/sunday-funnies/" },
+          "thorkcade": { "status": "scaffolded", "path": "/thorkcade/" },
+          "pfc": { "status": "scaffolded", "path": "/pfc/" },
+          "insider": { "status": "scaffolded", "path": "/insider/" }
+    },
+    "mcp": {
+          "manifest": "/__mcp/mcp.json",
+          "dashboard": "/__mcp/",
+          "access": "cloudflare-zero-trust"
+    }
+}
