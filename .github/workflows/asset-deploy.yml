@@ -1,0 +1,139 @@
+name: ThorKC Asset Deployment Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'assets/**'
+  workflow_dispatch:
+    inputs:
+      force_all:
+        description: 'Re-process and re-upload ALL assets (not just changed)'
+        required: false
+        default: 'false'
+        type: boolean
+
+concurrency:
+  group: asset-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '20'
+  ASSET_STORAGE_PROVIDER: ${{ vars.ASSET_STORAGE_PROVIDER || 'cloudflare' }}
+  CDN_BASE_URL: ${{ vars.CDN_BASE_URL }}
+
+jobs:
+  detect-changes:
+    name: Detect Changed Assets
+    runs-on: ubuntu-latest
+    outputs:
+      changed_files: ${{ steps.changes.outputs.changed }}
+      has_changes:   ${{ steps.changes.outputs.has_changes }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Identify changed asset files
+        id: changes
+        run: |
+          if [ "${{ github.event.inputs.force_all }}" = "true" ]; then
+            FILES=$(find assets/ -type f | tr '\n' ',' | sed 's/,$//')
+            echo "changed=$FILES" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            FILES=$(git diff --name-only HEAD~1 HEAD -- 'assets/**' | tr '\n' ',' | sed 's/,$//')
+            if [ -z "$FILES" ]; then
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+            else
+              echo "changed=$FILES" >> $GITHUB_OUTPUT
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+  optimize-and-deploy:
+    name: Optimize to Upload to Manifest
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --include=optional
+      - name: Optimize assets
+        run: |
+          if [ "${{ github.event.inputs.force_all }}" = "true" ]; then
+            node scripts/optimize.js --all
+          else
+            node scripts/optimize.js
+          fi
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: optimized-assets
+          path: dist/
+          retention-days: 7
+      - name: Upload to Cloudflare R2
+        env:
+          ASSET_STORAGE_PROVIDER: cloudflare
+          AWS_ACCESS_KEY_ID:     ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          CF_ACCOUNT_ID:         ${{ secrets.CF_ACCOUNT_ID }}
+          ASSET_BUCKET:          ${{ vars.ASSET_BUCKET }}
+          CDN_BASE_URL:          ${{ vars.CDN_BASE_URL }}
+        run: node scripts/upload.js
+      - name: Update assets-manifest.json
+        env:
+          CDN_BASE_URL: ${{ vars.CDN_BASE_URL }}
+        run: node scripts/update-manifest.js
+      - name: Commit manifest update
+        run: |
+          git config user.name  "ThorKC Asset Bot"
+          git config user.email "assets-bot@thorkc.com"
+          git add assets-manifest.json
+          if git diff --staged --quiet; then
+            echo "Manifest unchanged."
+          else
+            git commit -m "chore(assets): update manifest [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+      - name: Purge CDN cache
+        if: ${{ vars.CDN_PURGE_ENABLED == 'true' }}
+        env:
+          CDN_PURGE_PROVIDER: cloudflare
+          CF_ZONE_ID:   ${{ secrets.CF_ZONE_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: node scripts/purge-cdn.js
+      - name: Notify on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {"text": "ThorKC asset pipeline failed on ${{ github.ref_name }}. See ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  summary:
+    name: Pipeline Summary
+    runs-on: ubuntu-latest
+    needs: [detect-changes, optimize-and-deploy]
+    if: always()
+    steps:
+      - name: Print summary
+        run: |
+          echo "## ThorKC Asset Pipeline Run Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Detect changes | ${{ needs.detect-changes.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Optimize Upload Manifest | ${{ needs.optimize-and-deploy.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "**Trigger:** ${{ github.event_name }} on ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
