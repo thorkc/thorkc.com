@@ -1,18 +1,53 @@
 {
-    "site": "thorkc.com",
-    "version": "1.0.0",
-    "last_deploy": null,
-    "sections": {
-          "home": { "status": "live", "path": "/" },
-          "journal": { "status": "scaffolded", "path": "/journal/" },
-          "sunday-funnies": { "status": "scaffolded", "path": "/sunday-funnies/" },
-          "thorkcade": { "status": "scaffolded", "path": "/thorkcade/" },
-          "pfc": { "status": "scaffolded", "path": "/pfc/" },
-          "insider": { "status": "scaffolded", "path": "/insider/" }
-    },
-    "mcp": {
-          "manifest": "/__mcp/mcp.json",
-          "dashboard": "/__mcp/",
-          "access": "cloudflare-zero-trust"
-    }
+      "generated_at": "2026-06-06T12:08:00Z",
+      "global_status": "HEALTHY",
+      "mcp_version": "1.0.0",
+      "checks": {
+              "journal": {
+                        "status": "HEALTHY",
+                        "entry_count": 47,
+                        "index_exists": true,
+                        "index_age": "2026-06-06T06:14:22Z",
+                        "html_count": 47
+              },
+              "thorkcade": {
+                        "status": "NEEDS_ATTENTION",
+                        "file_count": 6,
+                        "note": "GRID RUNNER cabinet marked OFFLINE"
+              },
+              "assets": {
+                        "status": "HEALTHY",
+                        "local_file_count": 247,
+                        "manifest_exists": true,
+                        "manifest_version": "2.6.0",
+                        "manifest_age": "2026-06-06T06:14:22Z",
+                        "asset_count": 247,
+                        "cdn_base": "https://assets.thorkc.com",
+                        "r2_status": "OPERATIONAL",
+                        "pipeline_status": "SUCCESS",
+                        "last_pipeline_run": "2026-06-06T06:14:22Z"
+              },
+              "pfc": {
+                        "status": "HEALTHY",
+                        "file_count": 4,
+                        "config": true
+              },
+              "mcp": {
+                        "status": "OPERATIONAL",
+                        "index_exists": true,
+                        "manifest": true,
+                        "emblem": true,
+                        "version": "1.0.0"
+              },
+              "deployment": {
+                        "status": "OPERATIONAL",
+                        "redirects_exist": true,
+                        "headers_exist": true,
+                        "robots_exists": true,
+                        "mcp_route": "/__mcp/",
+                        "mcp_public": false,
+                        "cloudflare_access": true,
+                        "mfa_required": true
+              }
+      }
 }
