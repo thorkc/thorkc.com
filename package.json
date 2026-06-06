@@ -1,0 +1,17 @@
+{
+  "name": "thorkc-site",
+  "version": "1.0.0",
+  "description": "ThorKC.com — static site with graphics pipeline",
+  "private": true,
+  "scripts": {
+    "process-graphics": "node process-graphics.js",
+    "build": "node process-graphics.js",
+    "watch": "node process-graphics.js --watch"
+  },
+  "dependencies": {
+    "sharp": "^0.33.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
