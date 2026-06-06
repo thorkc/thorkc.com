@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "name": "thorkc-site",
+  "display_name": "ThorKC Site MCP",
+  "description": "Model Context Protocol manifest for thorkc.com — AI-assisted editing, Journal orchestration, and site management via GitHub.",
+  "base_url": "https://thorkc.com",
+  "repo": "thorkc/thorkc.com",
+  "branch": "main",
+  "sections": {
+    "journal":        { "path": "journal/",        "schema": "journal/_schema.json", "index": "journal/_index.json", "template": "journal/_template.html" },
+    "sunday-funnies": { "path": "sunday-funnies/", "schema": null, "index": null, "template": null },
+    "thorkcade":      { "path": "thorkcade/",      "schema": null, "index": null, "template": null },
+    "pfc":            { "path": "pfc/",            "schema": "pfc/_schema.json", "index": "pfc/_index.json", "template": null },
+    "insider":        { "path": "insider/",        "schema": null, "index": null, "template": null }
+  },
+  "tools": [
+    { "name": "list_journal_entries",  "description": "Return all Journal entries from journal/_index.json", "input": {}, "output": "journal/_index.json" },
+    { "name": "create_journal_entry",  "description": "Scaffold a new Journal entry using journal/_template.html", "input": { "slug": "string", "title": "string", "author": "string", "tags": "string[]" }, "output": "journal/{slug}/index.html" },
+    { "name": "publish_journal_entry", "description": "Set status=published in journal/_index.json for a given slug", "input": { "slug": "string" }, "output": "journal/_index.json" },
+    { "name": "get_site_status",       "description": "Return section live-status and last-commit info", "input": {}, "output": "_admin/status.json" },
+    { "name": "edit_section_index",    "description": "Open the index.html for a given section for editing", "input": { "section": "string" }, "output": "{section}/index.html" },
+    { "name": "update_global_nav",     "description": "Patch nav links across all section index pages", "input": { "nav_items": "array" }, "output": "index.html" }
+  ],
+  "auth": {
+    "type": "github_token",
+    "scopes": ["repo"],
+    "env_var": "GITHUB_TOKEN",
+    "note": "Set GITHUB_TOKEN in your MCP client env to enable write operations."
+  },
+  "deploy": {
+    "platform": "cloudflare_pages",
+    "project": "thorkc-com",
+    "custom_domain": "thorkc.com",
+    "build_command": "",
+    "output_dir": "/",
+    "trigger": "git_push_to_main"
+  }
+}
