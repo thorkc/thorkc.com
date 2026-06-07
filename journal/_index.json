@@ -1,3 +1,19 @@
 {
-    "entries": []
+  "version": "1.0.0",
+  "generated_at": "2026-06-06T20:51:00Z",
+  "total": 1,
+  "entries": [
+    {
+      "slug": "2026-06-06-launch",
+      "title": "ThorKC.com Goes Live",
+      "date": "2026-06-06",
+      "author": "ThorKC",
+      "tags": ["meta", "launch", "site"],
+      "thumbnail": "https://assets.thorkc.com/journal/2026-06-06-launch/thumb.webp",
+      "hero": "https://assets.thorkc.com/journal/2026-06-06-launch/hero.webp",
+      "excerpt": "The MCP is operational. The console is live. ThorKC.com enters production.",
+      "path": "/journal/2026-06-06-launch.html",
+      "status": "published"
+    }
+  ]
 }

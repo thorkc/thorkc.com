@@ -1,0 +1,68 @@
+{
+  "version": "2.7.0",
+  "generated_at": "2026-06-06T20:51:00Z",
+  "cdn_base": "https://assets.thorkc.com",
+  "total_files": 247,
+  "sections": {
+    "journal": {
+      "path": "journal/",
+      "file_count": 0,
+      "entries": []
+    },
+    "thorkcade": {
+      "path": "thorkcade/",
+      "file_count": 1,
+      "entries": [
+        {
+          "name": "og-card",
+          "formats": {
+            "webp": "https://assets.thorkc.com/thorkcade/og-card.webp",
+            "jpg":  "https://assets.thorkc.com/thorkcade/og-card.jpg"
+          }
+        }
+      ]
+    },
+    "brand": {
+      "path": "brand/",
+      "file_count": 0,
+      "entries": []
+    },
+    "pfc": {
+      "path": "pfc/",
+      "file_count": 0,
+      "entries": []
+    },
+    "sunday-funnies": {
+      "path": "sunday-funnies/",
+      "file_count": 0,
+      "entries": []
+    },
+    "og": {
+      "path": "og/",
+      "file_count": 1,
+      "entries": [
+        {
+          "name": "site-og",
+          "formats": {
+            "jpg": "https://assets.thorkc.com/og/site-og.jpg"
+          }
+        }
+      ]
+    },
+    "misc": {
+      "path": "misc/",
+      "file_count": 246,
+      "note": "Legacy assets — not yet catalogued by section"
+    }
+  },
+  "pipeline": {
+    "optimizer": "sharp",
+    "webp_quality": 82,
+    "avif_quality": 72,
+    "jpeg_quality": 85,
+    "png_compression": 9,
+    "formats_output": ["webp", "avif", "original"],
+    "incoming_dir": "_incoming/",
+    "processed_dir": "_incoming/processed/"
+  }
+}

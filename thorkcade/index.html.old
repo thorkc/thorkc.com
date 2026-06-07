@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ThorKCade</title>
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+</head>
+
+<body>
+
+<header class="sub-header">
+    <h1>ThorKCade</h1>
+    <p class="subhead">A curated home arcade experience.</p>
+</header>
+
+<main class="arcade-grid">
+    <div class="arcade-card">
+        <img src="/assets/img/placeholder.jpg">
+        <h3>Machine Placeholder</h3>
+        <p>Your full collection will appear here soon.</p>
+    </div>
+</main>
+
+</body>
+</html>

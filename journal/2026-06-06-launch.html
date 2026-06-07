@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- MCP:FIELD title="ThorKC.com Goes Live" -->
+  <title>ThorKC.com Goes Live | ThorKC Journal</title>
+  <meta name="description" content="The MCP is operational. The console is live. ThorKC.com enters production.">
+  <meta name="author" content="ThorKC">
+  <!-- MCP:FIELD date="2026-06-06" -->
+  <!-- MCP:FIELD author="ThorKC" -->
+  <!-- MCP:FIELD tags="meta,launch,site" -->
+  <!-- MCP:FIELD slug="2026-06-06-launch" -->
+  <!-- MCP:FIELD status="published" -->
+  <!-- MCP:FIELD hero="https://assets.thorkc.com/journal/2026-06-06-launch/hero.webp" -->
+  <!-- MCP:FIELD thumbnail="https://assets.thorkc.com/journal/2026-06-06-launch/thumb.webp" -->
+  <meta property="og:title" content="ThorKC.com Goes Live">
+  <meta property="og:description" content="The MCP is operational. The console is live. ThorKC.com enters production.">
+  <meta property="og:image" content="https://assets.thorkc.com/journal/2026-06-06-launch/hero.webp">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://thorkc.com/journal/2026-06-06-launch.html">
+  <style>
+    :root {
+      --gold:     #c9a84c;
+      --gold-dim: #7a6230;
+      --red:      #b03020;
+      --black:    #080808;
+      --dark:     #101010;
+      --surface:  #161616;
+      --border:   #252525;
+      --text:     #ddd5bc;
+      --text-dim: #7a7060;
+      --font-mono: 'Courier New', 'Consolas', monospace;
+      --font-body: Georgia, 'Times New Roman', serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background: var(--black); color: var(--text); scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.85;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── Site nav ── */
+    .site-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 56px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .site-nav a { color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+    .site-nav a:hover { color: var(--gold); }
+    .site-nav .brand { color: var(--gold); font-size: 12px; letter-spacing: 0.3em; }
+
+    /* ── Hero ── */
+    .hero {
+      width: 100%;
+      aspect-ratio: 16 / 7;
+      object-fit: cover;
+      display: block;
+      margin-bottom: 40px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .hero-placeholder {
+      width: 100%;
+      aspect-ratio: 16 / 7;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 40px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--border);
+    }
+
+    /* ── Article meta ── */
+    .article-meta {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .article-meta .tag {
+      color: var(--gold);
+      border: 1px solid var(--gold-dim);
+      padding: 1px 7px;
+      border-radius: 2px;
+      font-size: 9px;
+    }
+
+    /* ── Article title ── */
+    h1 {
+      font-family: var(--font-mono);
+      font-size: clamp(22px, 4vw, 34px);
+      font-weight: bold;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    .article-excerpt {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.7;
+    }
+
+    /* ── Body copy ── */
+    .article-body p { margin-bottom: 28px; }
+    .article-body h2 {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 48px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .article-body h3 {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin: 32px 0 12px;
+    }
+    .article-body strong { color: var(--text); font-weight: bold; }
+    .article-body em { color: var(--gold); font-style: normal; }
+    .article-body a { color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--gold-dim); }
+    .article-body a:hover { border-bottom-color: var(--gold); }
+    .article-body code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      border-radius: 2px;
+      color: var(--gold);
+    }
+    .article-body blockquote {
+      border-left: 2px solid var(--gold-dim);
+      padding: 4px 20px;
+      margin: 32px 0;
+      color: var(--text-dim);
+      font-style: italic;
+    }
+
+    /* ── Footer ── */
+    .article-footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .article-footer a { color: var(--text-dim); text-decoration: none; }
+    .article-footer a:hover { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <a href="/" class="brand">ThorKC</a>
+    <div style="display:flex;gap:24px">
+      <a href="/journal/">Journal</a>
+      <a href="/thorkcade/">ThorKCade</a>
+      <a href="/pfc/">PFC</a>
+    </div>
+  </nav>
+
+  <!-- MCP:FIELD hero_img -->
+  <div class="hero-placeholder">Hero Image — Upload to assets.thorkc.com</div>
+
+  <div class="article-meta">
+    <span>June 6, 2026</span>
+    <span>ThorKC</span>
+    <span class="tag">Meta</span>
+    <span class="tag">Launch</span>
+    <span class="tag">Site</span>
+  </div>
+
+  <!-- MCP:FIELD h1 -->
+  <h1>ThorKC.com Goes Live</h1>
+
+  <!-- MCP:FIELD excerpt -->
+  <p class="article-excerpt">
+    The MCP is operational. The console is live. ThorKC.com enters production.
+  </p>
+
+  <!-- MCP:FIELD body -->
+  <div class="article-body">
+
+    <p>
+      After years of iteration, experimentation, and a healthy dose of stubbornness, ThorKC.com
+      is officially in production. The site you're reading right now is running on a hardened
+      Cloudflare Pages stack with a custom operator control layer — the MCP — sitting behind
+      Zero Trust authentication and doing exactly what it was built to do.
+    </p>
+
+    <h2>What the MCP Is</h2>
+
+    <p>
+      The <em>Master Control Program</em> is the internal deployment orchestrator for this site.
+      It's not a framework. It's not a CMS. It's a purpose-built operator console that lives
+      at <code>/__mcp/</code>, runs three panels — Launcher, System Monitor, and Deploy Engine —
+      and gives the operator a live view of every section of the site from a single authenticated
+      dashboard.
+    </p>
+
+    <p>
+      The Launcher fires all six registered tools: journal entry management, site status checks,
+      section index validation, and global nav updates. The System Monitor polls
+      <code>_admin/status.json</code> every sixty seconds and lights up health tiles for Journal,
+      Assets, ThorKCade, PFC, MCP, and Deployment. The Deploy Engine runs pre-flight checks
+      before any push to main.
+    </p>
+
+    <h2>What's Live Right Now</h2>
+
+    <p>
+      The Journal is live with this entry as its first. The asset pipeline is operational — 247
+      files managed, CDN at <code>assets.thorkc.com</code>, WebP and AVIF output for every
+      processed image. ThorKCade is up with one cabinet currently under maintenance.
+      PFC is running. Sunday Funnies is standing by.
+    </p>
+
+    <blockquote>
+      Everything on this site was built to be operated, not just maintained.
+      The MCP is the difference between a website and a machine.
+    </blockquote>
+
+    <h2>What Comes Next</h2>
+
+    <p>
+      More Journal entries. More cabinet installs in ThorKCade. Graphics pipeline expansion.
+      The Insider section. Revenue-generating activity. The site is not finished — it's
+      <em>operational</em>, which is the state it was always meant to reach first.
+    </p>
+
+    <p>
+      Stay tuned. The MCP is watching.
+    </p>
+
+  </div>
+
+  <footer class="article-footer">
+    <span>ThorKC.com &mdash; Journal</span>
+    <a href="/journal/">← Back to Journal</a>
+  </footer>
+
+</body>
+</html>
