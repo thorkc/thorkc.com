@@ -1,0 +1,163 @@
+/* ============================================================
+   MCP CORE — Layout, Variables, Resets
+   ThorKC.com Master Control Program | mcp-core.css v1.0.0
+   ============================================================ */
+
+:root {
+  /* Palette */
+  --mcp-black:        #080808;
+  --mcp-dark:         #101010;
+  --mcp-surface:      #161616;
+  --mcp-surface-2:    #1e1e1e;
+  --mcp-border:       #252525;
+  --mcp-border-dim:   #1a1a1a;
+
+  /* Brand */
+  --mcp-gold:         #c9a84c;
+  --mcp-gold-bright:  #e0bf6a;
+  --mcp-gold-dim:     #7a6230;
+  --mcp-red:          #b03020;
+  --mcp-red-bright:   #d94030;
+  --mcp-red-dim:      #6a1e14;
+
+  /* Text */
+  --mcp-text:         #ddd5bc;
+  --mcp-text-dim:     #7a7060;
+  --mcp-text-muted:   #3a3a3a;
+
+  /* State colors */
+  --mcp-ok:           #2e8b57;
+  --mcp-ok-bright:    #3ab56f;
+  --mcp-warn:         #c8960a;
+  --mcp-warn-bright:  #e0aa0c;
+  --mcp-err:          #b03020;
+  --mcp-err-bright:   #d94030;
+
+  /* Typography */
+  --mcp-font-mono:    'Courier New', 'Lucida Console', 'Consolas', monospace;
+  --mcp-font-ui:      'Segoe UI', 'Arial', sans-serif;
+
+  /* Geometry */
+  --mcp-radius:       2px;
+  --mcp-nav-width:    210px;
+  --mcp-bar-height:   44px;
+
+  /* Effects */
+  --mcp-glow-gold:    0 0 10px rgba(201,168,76,0.35);
+  --mcp-glow-red:     0 0 10px rgba(176,48,32,0.45);
+  --mcp-trans:        0.18s ease;
+  --mcp-trans-slow:   0.5s ease;
+}
+
+/* ---- Reset ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--mcp-black);
+  color: var(--mcp-text);
+  font-family: var(--mcp-font-mono);
+  font-size: 13px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--mcp-gold); text-decoration: none; transition: color var(--mcp-trans); }
+a:hover { color: var(--mcp-gold-bright); }
+
+button, input, select, textarea {
+  font-family: var(--mcp-font-mono);
+  font-size: 13px;
+  color: var(--mcp-text);
+}
+
+/* ---- Boot Screen ---- */
+#mcp-boot {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: var(--mcp-black);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  cursor: pointer;
+  transition: opacity 0.7s ease;
+}
+#mcp-boot.dismissed {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---- App Shell ---- */
+#mcp-app {
+  display: grid;
+  grid-template-rows: var(--mcp-bar-height) 1fr;
+  grid-template-columns: var(--mcp-nav-width) 1fr;
+  grid-template-areas:
+    "topbar topbar"
+    "nav    content";
+  height: 100vh;
+  opacity: 0;
+  transition: opacity 0.6s ease 0.15s;
+}
+#mcp-app.visible { opacity: 1; }
+
+/* ---- Top Bar ---- */
+#mcp-topbar {
+  grid-area: topbar;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: var(--mcp-dark);
+  border-bottom: 1px solid var(--mcp-gold-dim);
+  z-index: 100;
+}
+#mcp-topbar .mcp-title {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--mcp-gold);
+}
+#mcp-topbar .mcp-clock {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--mcp-text-dim);
+}
+
+/* ---- Sidebar Nav ---- */
+#mcp-nav {
+  grid-area: nav;
+  background: var(--mcp-dark);
+  border-right: 1px solid var(--mcp-border);
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow-y: auto;
+}
+
+/* ---- Content Area ---- */
+#mcp-content {
+  grid-area: content;
+  background: var(--mcp-surface);
+  overflow-y: auto;
+  position: relative;
+}
+#mcp-content::-webkit-scrollbar { width: 5px; }
+#mcp-content::-webkit-scrollbar-track { background: var(--mcp-dark); }
+#mcp-content::-webkit-scrollbar-thumb {
+  background: var(--mcp-gold-dim);
+  border-radius: 2px;
+}
+
+/* ---- Panels (show/hide) ---- */
+.mcp-panel {
+  display: none;
+  padding: 28px 32px;
+  min-height: 100%;
+}
+.mcp-panel.active { display: block; }

@@ -1,0 +1,331 @@
+/* ============================================================
+   MCP PANELS — Launcher, System Monitor, Deploy Engine
+   ThorKC.com Master Control Program | mcp-panels.css v1.0.0
+   ============================================================ */
+
+/* ==============================
+   SHARED PANEL PRIMITIVES
+   ============================== */
+
+.mcp-card {
+  background: var(--mcp-surface-2);
+  border: 1px solid var(--mcp-border);
+  border-radius: var(--mcp-radius);
+  padding: 16px 18px;
+  transition: border-color var(--mcp-trans);
+}
+.mcp-card:hover { border-color: var(--mcp-gold-dim); }
+
+.mcp-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.mcp-card-title {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--mcp-gold);
+}
+.mcp-card-body {
+  font-size: 12px;
+  color: var(--mcp-text-dim);
+  line-height: 1.7;
+}
+
+.mcp-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.mcp-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+@media (max-width: 900px) {
+  .mcp-grid-2, .mcp-grid-3 { grid-template-columns: 1fr; }
+}
+
+.mcp-divider {
+  height: 1px;
+  background: var(--mcp-border-dim);
+  margin: 22px 0;
+}
+
+.mcp-kv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--mcp-border-dim);
+  font-size: 12px;
+}
+.mcp-kv-row:last-child { border-bottom: none; }
+.mcp-kv-key   { color: var(--mcp-text-dim); letter-spacing: 0.05em; }
+.mcp-kv-value { color: var(--mcp-text); font-weight: bold; text-align: right; }
+
+/* ==============================
+   PANEL 1 — LAUNCHER
+   ============================== */
+
+#panel-launcher {}
+
+/* Tool grid */
+.launcher-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.launcher-tool-card {
+  background: var(--mcp-surface-2);
+  border: 1px solid var(--mcp-border);
+  border-radius: var(--mcp-radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all var(--mcp-trans);
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+.launcher-tool-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--mcp-gold-dim);
+  transition: background var(--mcp-trans);
+}
+.launcher-tool-card:hover {
+  border-color: var(--mcp-gold-dim);
+  background: rgba(201,168,76,0.04);
+  box-shadow: var(--mcp-glow-gold);
+}
+.launcher-tool-card:hover::before { background: var(--mcp-gold); }
+.launcher-tool-card.running {
+  border-color: var(--mcp-warn);
+  pointer-events: none;
+}
+.launcher-tool-card.running::before { background: var(--mcp-warn); }
+
+.launcher-tool-name {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mcp-gold);
+  margin-bottom: 5px;
+}
+.launcher-tool-desc {
+  font-size: 11px;
+  color: var(--mcp-text-muted);
+  line-height: 1.5;
+}
+.launcher-tool-spinner {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+/* Result area */
+.launcher-result-wrap {
+  margin-top: 8px;
+}
+.launcher-result-label {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--mcp-text-muted);
+  margin-bottom: 8px;
+}
+
+/* Modal overlay for tool forms */
+.launcher-modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+}
+.launcher-modal-bg.open { display: flex; }
+
+.launcher-modal {
+  background: var(--mcp-surface);
+  border: 1px solid var(--mcp-gold-dim);
+  border-radius: var(--mcp-radius);
+  padding: 28px 32px;
+  width: 480px;
+  max-width: 92vw;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
+  animation: mcp-fadein 0.2s ease;
+}
+.launcher-modal-title {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--mcp-gold);
+  margin-bottom: 20px;
+}
+.launcher-modal-field {
+  margin-bottom: 14px;
+}
+.launcher-modal-field label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mcp-text-dim);
+  margin-bottom: 5px;
+}
+.launcher-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+  justify-content: flex-end;
+}
+
+/* ==============================
+   PANEL 2 — SYSTEM MONITOR
+   ============================== */
+
+#panel-system {}
+
+/* Health overview row */
+.system-health-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.system-health-tile {
+  background: var(--mcp-surface-2);
+  border: 1px solid var(--mcp-border);
+  border-radius: var(--mcp-radius);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color var(--mcp-trans);
+}
+.system-health-tile:hover { border-color: var(--mcp-border); }
+.system-health-tile.ok   { border-left: 2px solid var(--mcp-ok); }
+.system-health-tile.warn { border-left: 2px solid var(--mcp-warn); }
+.system-health-tile.err  { border-left: 2px solid var(--mcp-err); }
+
+.system-health-section {
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--mcp-text-muted);
+}
+.system-health-status {
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+}
+.system-health-tile.ok   .system-health-status { color: var(--mcp-ok-bright); }
+.system-health-tile.warn .system-health-status { color: var(--mcp-warn-bright); }
+.system-health-tile.err  .system-health-status { color: var(--mcp-err-bright); }
+
+/* Detail cards */
+.system-detail-section {
+  margin-bottom: 24px;
+}
+
+/* Refresh controls */
+.system-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.system-last-updated {
+  font-size: 11px;
+  color: var(--mcp-text-muted);
+  margin-left: auto;
+}
+
+/* ==============================
+   PANEL 3 — DEPLOY ENGINE
+   ============================== */
+
+#panel-deploy {}
+
+.deploy-warning-bar {
+  background: rgba(176,48,32,0.1);
+  border: 1px solid var(--mcp-red-dim);
+  border-radius: var(--mcp-radius);
+  padding: 12px 16px;
+  font-size: 11px;
+  color: var(--mcp-red-bright);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.deploy-warning-bar::before {
+  content: '⚠';
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.deploy-action-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  background: var(--mcp-surface-2);
+  border: 1px solid var(--mcp-border);
+  border-radius: var(--mcp-radius);
+}
+.deploy-action-info {
+  flex: 1;
+}
+.deploy-action-name {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--mcp-text);
+  margin-bottom: 3px;
+}
+.deploy-action-desc {
+  font-size: 11px;
+  color: var(--mcp-text-muted);
+}
+
+/* Deploy log */
+.deploy-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.deploy-log-title {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--mcp-text-muted);
+}
+.deploy-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.deploy-status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--mcp-text-muted);
+}
+.deploy-status-dot.idle    { background: var(--mcp-text-muted); }
+.deploy-status-dot.running { background: var(--mcp-warn); animation: mcp-pulse 1s ease-in-out infinite; }
+.deploy-status-dot.ok      { background: var(--mcp-ok); }
+.deploy-status-dot.err     { background: var(--mcp-err); }
