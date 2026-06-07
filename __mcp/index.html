@@ -1,58 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>MCP Console</title>
-    <link rel="stylesheet" href="/__mcp/assets/css/mcp-core.css">
-    <link rel="stylesheet" href="/__mcp/assets/css/mcp-theme.css">
-    <link rel="stylesheet" href="/__mcp/assets/css/mcp-panels.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP Console — ThorKC.com</title>
+  <meta name="robots" content="noindex, nofollow">
+  <!-- MCP:META version="1.1.0" protected="true" -->
+
+  <!-- Core layout, variables, reset -->
+  <link rel="stylesheet" href="/__mcp/assets/css/mcp-core.css">
+  <!-- Visual identity, animations, typography -->
+  <link rel="stylesheet" href="/__mcp/assets/css/mcp-theme.css">
+  <!-- Panel-specific rules: Launcher, System Monitor, Deploy Engine -->
+  <link rel="stylesheet" href="/__mcp/assets/css/mcp-panels.css">
+
+  <style>
+    /* ── Panel visibility (toggled by mcp-system.js activatePanel) ── */
+    .mcp-panel          { display: none; }
+    .mcp-panel.active   { display: block; }
+
+    /* ── Content area scrolling ── */
+    #mcp-content {
+      grid-area: content;
+      overflow-y: auto;
+      padding: 28px 32px 48px;
+      background: var(--mcp-black);
+    }
+
+    /* ── Modal overlay ── */
+    .mcp-modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      z-index: 8000;
+      align-items: center;
+      justify-content: center;
+    }
+    .mcp-modal-bg.open { display: flex; }
+    .mcp-modal {
+      background: var(--mcp-surface);
+      border: 1px solid var(--mcp-gold-dim);
+      border-radius: var(--mcp-radius);
+      padding: 28px 32px;
+      width: min(520px, 92vw);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    /* ── System / Deploy panel extras ── */
+    .system-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .system-last-updated { font-size: 11px; color: var(--mcp-text-muted); }
+    .system-health-bar   { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 12px; margin-bottom: 24px; }
+    .system-health-tile  { background: var(--mcp-surface-2); border: 1px solid var(--mcp-border); border-radius: var(--mcp-radius); padding: 12px 14px; }
+    .system-health-tile.ok   { border-left: 3px solid var(--mcp-ok); }
+    .system-health-tile.warn { border-left: 3px solid var(--mcp-warn); }
+    .system-health-tile.err  { border-left: 3px solid var(--mcp-err); }
+    .system-health-section  { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--mcp-text-dim); margin-bottom: 6px; }
+    .system-health-status   { font-size: 13px; font-weight: bold; color: var(--mcp-text); }
+    .system-health-tile.ok   .system-health-status { color: var(--mcp-ok-bright); }
+    .system-health-tile.warn .system-health-status { color: var(--mcp-warn-bright); }
+    .system-health-tile.err  .system-health-status { color: var(--mcp-err-bright); }
+
+    .deploy-warning-bar {
+      background: rgba(200,150,10,.08);
+      border: 1px solid var(--mcp-warn);
+      border-radius: var(--mcp-radius);
+      padding: 10px 14px;
+      font-size: 11px;
+      color: var(--mcp-warn-bright);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .deploy-action-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--mcp-border-dim);
+    }
+    .deploy-action-row:last-of-type { border-bottom: none; }
+    .deploy-action-name { font-size: 12px; color: var(--mcp-text); margin-bottom: 3px; }
+    .deploy-action-desc { font-size: 11px; color: var(--mcp-text-muted); }
+    .deploy-log-header  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .deploy-log-title   { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--mcp-text-dim); }
+    .deploy-status-indicator { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--mcp-text-dim); }
+    .deploy-status-dot  { width: 8px; height: 8px; border-radius: 50%; background: var(--mcp-border); }
+    .deploy-status-dot.running { background: var(--mcp-warn-bright); animation: mcp-pulse 1s ease-in-out infinite; }
+    .deploy-status-dot.ok      { background: var(--mcp-ok-bright); }
+    .deploy-status-dot.err     { background: var(--mcp-err-bright); }
+    .deploy-status-dot.idle    { background: var(--mcp-border); }
+
+    .mcp-section-label {
+      font-size: 9px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--mcp-text-muted);
+      margin: 20px 0 10px;
+    }
+
+    /* ── MCP button shared ── */
+    .mcp-btn {
+      background: transparent;
+      border: 1px solid var(--mcp-gold-dim);
+      color: var(--mcp-gold);
+      padding: 6px 14px;
+      font-size: 10px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      border-radius: var(--mcp-radius);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--mcp-trans);
+    }
+    .mcp-btn:hover  { border-color: var(--mcp-gold); background: rgba(201,168,76,.08); }
+    .mcp-btn:active { background: rgba(201,168,76,.14); }
+    .mcp-btn:disabled { opacity: .4; cursor: not-allowed; }
+  </style>
 </head>
+<body>
 
-<body class="mcp-boot">
+  <!-- ═══════════════════════════════════════════════════════════
+       BOOT SCREEN
+       Click, Enter, Space, or auto-dismissed at 1.6s by mcp-system.js
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="mcp-boot">
+    <div class="mcp-boot-logo">THORKC.COM</div>
+    <div class="mcp-boot-sub">Master Control Program v1.1.0</div>
+    <div class="mcp-boot-bar"><div class="mcp-boot-bar-fill"></div></div>
+    <div class="mcp-boot-hint">CLICK OR PRESS ENTER TO CONTINUE</div>
+  </div>
 
-<div id="boot-sequence">
-    <pre>
-Initializing MCP...
-Loading subsystems...
-Grid online.
-Welcome, Operator.
-    </pre>
-</div>
+  <!-- ═══════════════════════════════════════════════════════════
+       APP SHELL  (grid: topbar / nav / content)
+       Revealed by mcp-system.js adding .visible class
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="mcp-app">
 
-<div id="mcp-ui" style="display:none;">
-    <header class="mcp-header">
-        <h1>MCP</h1>
-        <p class="sub">Mainframe Control Panel</p>
+    <!-- ── Top Bar ── -->
+    <header id="mcp-topbar">
+      <span class="mcp-title">MASTER CONTROL PROGRAM</span>
+      <span class="mcp-clock" id="mcp-clock">00:00:00 CDT</span>
     </header>
 
-    <nav class="mcp-nav">
-        <button data-panel="launcher">Launcher</button>
-        <button data-panel="system">System Mode</button>
-        <button data-panel="deploy">Deploy Engine</button>
-    </nav>
+    <!-- ── Side Nav (populated by mcp-system.js buildNav()) ── -->
+    <nav id="mcp-nav" aria-label="MCP navigation"></nav>
 
-    <main id="mcp-panels">
-        <section id="launcher" class="panel active">
-            <h2>Launcher</h2>
-            <p>Subsystem shortcuts and quick actions.</p>
-        </section>
+    <!-- ── Main Content ── -->
+    <main id="mcp-content">
 
-        <section id="system" class="panel">
-            <h2>System Mode</h2>
-            <p>Diagnostics and internal state.</p>
-        </section>
+      <!-- ── Panel 1: Launcher ── -->
+      <!-- mcp-launcher.js renders the tool grid and wires console output here -->
+      <section id="panel-launcher" class="mcp-panel active">
+        <p class="mcp-panel-title">Launcher</p>
+        <p class="mcp-panel-subtitle">Operator tools. Select a routine to execute against the live site.</p>
+        <!-- Tool cards injected by mcp-launcher.js -->
+        <div class="launcher-tool-grid" id="launcher-grid"></div>
+        <div class="mcp-divider"></div>
+        <p class="mcp-panel-title" style="margin-top:0">Console Output</p>
+        <div class="mcp-console" id="launcher-console">// Initializing&hellip;</div>
+      </section>
 
-        <section id="deploy" class="panel">
-            <h2>Deploy Engine</h2>
-            <button id="trigger-deploy">Trigger Cloudflare Deploy</button>
-        </section>
+      <!-- ── Panel 2: System Monitor ── -->
+      <!-- Fully built by mcp-system.js buildSystemPanel() -->
+      <section id="panel-system" class="mcp-panel"></section>
+
+      <!-- ── Panel 3: Deploy Engine ── -->
+      <!-- Fully built by mcp-system.js buildDeployPanel() -->
+      <section id="panel-deploy" class="mcp-panel"></section>
+
     </main>
-</div>
+  </div>
 
-<script src="/__mcp/assets/js/mcp-core.js"></script>
-<script src="/__mcp/assets/js/mcp-launcher.js"></script>
-<script src="/__mcp/assets/js/mcp-system.js"></script>
-<script src="/__mcp/assets/js/mcp-deploy.js"></script>
+  <!-- ═══════════════════════════════════════════════════════════
+       MODAL  (shared modal used by mcp-launcher.js tool forms)
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="mcp-modal-bg" class="mcp-modal-bg" role="dialog" aria-modal="true">
+    <div id="mcp-modal" class="mcp-modal mcp-frame"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SCRIPTS — load order is significant
+       mcp-core.js    → boot dismiss stub (preserved, not overwritten)
+       mcp-deploy.js  → Cloudflare hook (pre-existing credential file)
+       mcp-launcher.js→ Launcher panel & all 6 MCP tools
+       mcp-system.js  → Nav, System Monitor, Deploy Engine, clock, boot reveal
+  ═══════════════════════════════════════════════════════════ -->
+  <script src="/__mcp/assets/js/mcp-core.js"></script>
+  <script src="/__mcp/assets/js/mcp-deploy.js"></script>
+  <script src="/__mcp/assets/js/mcp-launcher.js"></script>
+  <script src="/__mcp/assets/js/mcp-system.js"></script>
 
 </body>
 </html>
