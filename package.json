@@ -1,34 +1,37 @@
 {
-    "name": "thorkc-site",
-    "version": "1.0.0",
-    "description": "ThorKC.com with automated asset pipeline",
-    "private": true,
-    "scripts": {
-          "process-graphics": "node process-graphics.js",
-          "build": "node process-graphics.js",
-          "optimize": "node scripts/optimize.js",
-          "optimize:all": "node scripts/optimize.js --all",
-          "upload": "node scripts/upload.js",
-          "upload:all": "node scripts/upload.js --all",
-          "upload:dry": "node scripts/upload.js --dry-run",
-          "manifest": "node scripts/update-manifest.js",
-          "manifest:rebuild": "node scripts/update-manifest.js --rebuild",
-          "purge": "node scripts/purge-cdn.js",
-          "watch": "node process-graphics.js --watch",
-          "watch:assets": "node scripts/watch.js",
-          "watch:assets:dry": "node scripts/watch.js --dry-run",
-          "deploy": "npm run optimize && npm run upload && npm run manifest && npm run purge",
-          "deploy:all": "npm run optimize:all && npm run upload:all && npm run manifest:rebuild && npm run purge",
-          "deploy:dry": "node scripts/optimize.js --all && node scripts/upload.js --dry-run && node scripts/update-manifest.js --dry-run"
-    },
-    "engines": {
-          "node": ">=18.0.0"
-    },
-    "dependencies": {
-          "@aws-sdk/client-s3": "^3.600.0",
-          "@azure/storage-blob": "^12.24.0",
-          "chokidar": "^3.6.0",
-          "sharp": "^0.33.4",
-          "svgo": "^3.3.2"
-    }
+      "name": "thorkc-site",
+      "version": "1.0.0",
+      "description": "ThorKC.com with automated asset pipeline",
+      "private": true,
+      "scripts": {
+              "process-graphics": "node process-graphics.js",
+              "build": "node scripts/inject-env.js && node scripts/optimize-assets.js",
+              "inject-env": "node scripts/inject-env.js",
+              "optimize-assets": "node scripts/optimize-assets.js",
+              "upload-r2": "node scripts/upload-to-r2.js",
+              "optimize": "node scripts/optimize.js",
+              "optimize:all": "node scripts/optimize.js --all",
+              "upload": "node scripts/upload.js",
+              "upload:all": "node scripts/upload.js --all",
+              "upload:dry": "node scripts/upload.js --dry-run",
+              "manifest": "node scripts/update-manifest.js",
+              "manifest:rebuild": "node scripts/update-manifest.js --rebuild",
+              "purge": "node scripts/purge-cdn.js",
+              "watch": "node process-graphics.js --watch",
+              "watch:assets": "node scripts/watch.js",
+              "watch:assets:dry": "node scripts/watch.js --dry-run",
+              "deploy": "npm run optimize && npm run upload && npm run manifest && npm run purge",
+              "deploy:all": "npm run optimize:all && npm run upload:all && npm run manifest:rebuild && npm run purge",
+              "deploy:dry": "node scripts/optimize.js --all && node scripts/upload.js --dry-run && node scripts/update-manifest.js --dry-run"
+      },
+      "engines": {
+              "node": ">=18.0.0"
+      },
+      "dependencies": {
+              "@aws-sdk/client-s3": "^3.600.0",
+              "@azure/storage-blob": "^12.24.0",
+              "chokidar": "^3.6.0",
+              "sharp": "^0.33.4",
+              "svgo": "^3.3.2"
+      }
 }
